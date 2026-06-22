@@ -1,14 +1,73 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using API_SI.Data;
+using API_SI.Middleware;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1. Configurar DbContext con PostgreSQL (Supabase)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
+// 2. Configurar CORS (Permisivo para desarrollo)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// 3. Configurar Autenticación JWT Bearer
+var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "ElectroShopPOSSuperSecretKey2026!ForAuthentication";
+var key = Encoding.ASCII.GetBytes(jwtSecret);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // Solo para desarrollo
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateLifetime = true
+    };
+});
+
+// 4. Agregar controladores y OpenAPI/Swagger
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+
+// Si quieres usar Swagger UI estándar, también puedes configurar OpenAPI
+// (AddOpenApi() se incluye por defecto en .NET 9).
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 5. Configurar el Pipeline de Middleware
+
+// Middleware de manejo de excepciones globales
+app.UseMiddleware<ExceptionMiddleware>();
+
+// Habilitar Swagger en desarrollo
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -16,6 +75,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// CORS
+app.UseCors("AllowAll");
+
+// Autenticación y Autorización
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
