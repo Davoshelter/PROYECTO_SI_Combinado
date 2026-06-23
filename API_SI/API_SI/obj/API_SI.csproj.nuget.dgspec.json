@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEMO_PYME\\API_SI\\API_SI\\API_SI.csproj": {}
+    "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj": {}
   },
   "projects": {
-    "D:\\DEMO_PYME\\API_SI\\API_SI\\API_SI.csproj": {
+    "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEMO_PYME\\API_SI\\API_SI\\API_SI.csproj",
+        "projectUniqueName": "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj",
         "projectName": "API_SI",
-        "projectPath": "D:\\DEMO_PYME\\API_SI\\API_SI\\API_SI.csproj",
+        "projectPath": "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj",
         "packagesPath": "C:\\Users\\Personal\\.nuget\\packages\\",
-        "outputPath": "D:\\DEMO_PYME\\API_SI\\API_SI\\obj\\",
+        "outputPath": "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\Visualstudio1\\NuGetPackages"
@@ -52,9 +52,21 @@
           "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.1, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.11, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.1, )"
             }
           },
           "imports": [
