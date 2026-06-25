@@ -150,6 +150,18 @@ namespace API_SI.Data
                 .HasIndex(rp => new { rp.IdRol, rp.IdModulo })
                 .IsUnique();
 
+            modelBuilder.Entity<RolPermiso>()
+                .HasOne(rp => rp.Rol)
+                .WithMany(r => r.RolPermisos)
+                .HasForeignKey(rp => rp.IdRol)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RolPermiso>()
+                .HasOne(rp => rp.Modulo)
+                .WithMany(m => m.RolPermisos)
+                .HasForeignKey(rp => rp.IdModulo)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<HistorialTipoCambio>()
                 .HasOne(h => h.Trabajador)
                 .WithMany(t => t.HistorialTipoCambios)
@@ -306,6 +318,21 @@ namespace API_SI.Data
 
             modelBuilder.Entity<PendienteConfiguracion>()
                 .HasCheckConstraint("chk_pendiente_singleton", "Id = 1");
+
+            // Convertir todas las tablas y columnas a minúsculas para PostgreSQL
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                var tableName = entity.GetTableName();
+                if (tableName != null)
+                {
+                    entity.SetTableName(tableName.ToLower());
+                }
+
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.Name.ToLower());
+                }
+            }
 
             // Seed Data
             SeedData(modelBuilder);

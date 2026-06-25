@@ -52,10 +52,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 4. Agregar controladores y OpenAPI/Swagger
+// 4. Agregar controladores y Swagger
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Si quieres usar Swagger UI estándar, también puedes configurar OpenAPI
 // (AddOpenApi() se incluye por defecto en .NET 9).
@@ -70,8 +70,10 @@ app.UseMiddleware<ExceptionMiddleware>();
 // Habilitar Swagger en desarrollo
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 
