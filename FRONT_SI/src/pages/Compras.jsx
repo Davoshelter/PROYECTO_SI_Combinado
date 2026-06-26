@@ -53,10 +53,16 @@ export default function Compras() {
     if (form.detalles.length === 0) { toast.error('Agregue productos'); return; }
     try {
       await api.post('/compra', {
-        proveedorId: Number(form.proveedorId),
-        observacion: form.observacion,
+        idProveedor: Number(form.proveedorId),
+        subtotal: totalCompra,
+        impuesto: 0,
+        total: totalCompra,
+        fechaEsperada: new Date().toISOString().split('T')[0],
+        notas: form.observacion,
         detalles: form.detalles.map(d => ({
-          productoId: d.productoId, cantidad: d.cantidad, costoUnitarioUSD: d.costoUnitarioUSD,
+          idProducto: d.productoId,
+          cantidad: d.cantidad,
+          costoUnitario: d.costoUnitarioUSD,
         })),
       });
       toast.success('Compra registrada — stock actualizado');
@@ -82,14 +88,14 @@ export default function Compras() {
       </div>
       <div className="table-container">
         <table>
-          <thead><tr><th>#</th><th>Fecha</th><th>Proveedor</th><th>Total USD</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>#</th><th>Fecha</th><th>Proveedor</th><th>Total</th><th>Acciones</th></tr></thead>
           <tbody>
             {filtered.map(c=>(
               <tr key={c.id}>
                 <td><strong>#{c.id}</strong></td>
-                <td className="text-sm">{new Date(c.creadoEn).toLocaleDateString('es-BO')}</td>
-                <td>{c.proveedorNombre||'—'}</td>
-                <td style={{fontWeight:700,color:'var(--yellow-400)'}}>${c.totalUSD?.toFixed(2)}</td>
+                <td className="text-sm">{new Date(c.fecha || c.creadoEn).toLocaleDateString('es-BO')}</td>
+                <td>{c.proveedor || c.proveedorNombre || '—'}</td>
+                <td style={{fontWeight:700,color:'var(--yellow-400)'}}>${(c.total || c.totalUSD)?.toFixed(2)}</td>
                 <td><button className="btn btn-ghost btn-sm" onClick={()=>{setSelected(c);setShowDetail(true);}}><Eye size={14}/></button></td>
               </tr>
             ))}
@@ -101,14 +107,18 @@ export default function Compras() {
       <Modal isOpen={showDetail} onClose={()=>setShowDetail(false)} title={`Compra #${selected?.id}`} size="lg">
         {selected && (
           <>
-            <div className="mb-2"><span className="text-muted text-sm">Proveedor:</span> <strong>{selected.proveedorNombre}</strong></div>
+            <div className="mb-2"><span className="text-muted text-sm">Proveedor:</span> <strong>{selected.proveedor?.nombre || selected.proveedorNombre || '—'}</strong></div>
             <div className="table-container">
               <table>
                 <thead><tr><th>Producto</th><th>Cant.</th><th>Costo Unit.</th><th>Subtotal</th></tr></thead>
                 <tbody>
                   {selected.detalles?.map((d,i)=>(
-                    <tr key={i}><td>{d.productoNombre||`#${d.productoId}`}</td><td>{d.cantidad}</td>
-                    <td>${d.costoUnitarioUSD?.toFixed(2)}</td><td style={{fontWeight:600}}>${(d.cantidad*d.costoUnitarioUSD).toFixed(2)}</td></tr>
+                    <tr key={i}>
+                      <td>{d.producto?.nombre || d.productoNombre || `#${d.productoId}`}</td>
+                      <td>{d.cantidad}</td>
+                      <td>${(d.costoUnitario || d.costoUnitarioUSD)?.toFixed(2)}</td>
+                      <td style={{fontWeight:600}}>${(d.cantidad * (d.costoUnitario || d.costoUnitarioUSD)).toFixed(2)}</td>
+                    </tr>
                   ))}
                 </tbody>
               </table>

@@ -38,11 +38,14 @@ namespace API_SI.Controllers
                     c.Id,
                     c.Numero,
                     c.ClienteNombre,
+                    ClienteTelefono = c.ClienteTelefono,
                     c.Total,
                     c.TotalMonedaLocal,
                     c.MonedaLocal,
                     c.FechaVencimiento,
+                    DiasValidez = c.DiasValidez,
                     c.Estado,
+                    FechaCreacion = c.FechaCreacion,
                     Trabajador = c.Trabajador.Nombre,
                     Vencida = c.FechaVencimiento < DateOnly.FromDateTime(DateTime.UtcNow) && c.Estado == "pendiente"
                 })

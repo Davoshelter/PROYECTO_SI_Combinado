@@ -25,7 +25,7 @@ export default function Caja() {
       const res = await api.get('/sesioncaja');
       const data = res.data;
       setSesiones(data);
-      const activa = data.find(s => s.estado === 'Abierta');
+      const activa = data.find(s => s.estado === 'abierta');
       setSesionActiva(activa || null);
     } catch { toast.error('Error al cargar sesiones de caja'); }
     finally { setLoading(false); }
@@ -39,7 +39,7 @@ export default function Caja() {
 
   const handleAbrir = async () => {
     try {
-      await api.post('/sesioncaja/abrir', { montoInicialBs: Number(montoInicial) });
+      await api.post('/sesioncaja/abrir', { montoApertura: Number(montoInicial) });
       toast.success('Caja abierta exitosamente');
       setShowAbrirModal(false);
       setMontoInicial(0);
@@ -49,9 +49,10 @@ export default function Caja() {
 
   const handleCerrar = async () => {
     try {
-      await api.post('/sesioncaja/cerrar', {
-        conteoEfectivo,
-        observacion,
+      await api.put(`/sesioncaja/${sesionActiva.id}/cerrar`, {
+        montoCierre: totalConteo(),
+        conteoEfectivo: JSON.stringify(conteoEfectivo),
+        notas: observacion,
       });
       toast.success('Caja cerrada exitosamente');
       setShowCerrarModal(false);
@@ -109,7 +110,7 @@ export default function Caja() {
               <h3 style={{ marginBottom: 4 }}>Caja Abierta</h3>
               <p className="text-muted text-sm">
                 Abierta el {new Date(sesionActiva.fechaApertura).toLocaleString('es-BO')} —
-                Monto inicial: Bs {sesionActiva.montoInicialBs?.toFixed(2)}
+                Monto inicial: Bs {sesionActiva.montoApertura?.toFixed(2)}
               </p>
             </div>
           </div>
@@ -119,16 +120,16 @@ export default function Caja() {
       {/* History */}
       <div className="table-container">
         <table>
-          <thead><tr><th>#</th><th>Apertura</th><th>Cierre</th><th>Monto Inicial</th><th>Total Conteo</th><th>Estado</th></tr></thead>
+          <thead><tr><th>#</th><th>Apertura</th><th>Cierre</th><th>Monto Inicial</th><th>Monto Cierre</th><th>Estado</th></tr></thead>
           <tbody>
             {sesiones.map(s=>(
               <tr key={s.id}>
                 <td><strong>#{s.id}</strong></td>
                 <td className="text-sm">{new Date(s.fechaApertura).toLocaleString('es-BO')}</td>
                 <td className="text-sm">{s.fechaCierre ? new Date(s.fechaCierre).toLocaleString('es-BO') : '—'}</td>
-                <td>Bs {s.montoInicialBs?.toFixed(2)}</td>
-                <td>{s.totalConteoBs ? `Bs ${s.totalConteoBs.toFixed(2)}` : '—'}</td>
-                <td><span className={`badge ${s.estado==='Abierta'?'badge-success':'badge-info'}`}>{s.estado}</span></td>
+                <td>Bs {s.montoApertura?.toFixed(2)}</td>
+                <td>{s.montoCierre ? `Bs ${s.montoCierre.toFixed(2)}` : '—'}</td>
+                <td><span className={`badge ${s.estado==='abierta'?'badge-success':'badge-info'}`}>{s.estado}</span></td>
               </tr>
             ))}
           </tbody>

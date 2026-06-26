@@ -107,7 +107,7 @@ namespace API_SI.Controllers
         }
 
         [HttpGet("{id}/permisos")]
-        public async Task<ActionResult<IEnumerable<RolPermiso>>> GetPermisos(int id)
+        public async Task<ActionResult<IEnumerable<object>>> GetPermisos(int id)
         {
             var rol = await _context.Roles.FindAsync(id);
             if (rol == null)
@@ -116,8 +116,17 @@ namespace API_SI.Controllers
             }
 
             var permisos = await _context.RolPermisos
-                .Include(rp => rp.Modulo)
                 .Where(rp => rp.IdRol == id)
+                .Select(rp => new
+                {
+                    rp.Id,
+                    rp.IdRol,
+                    rp.IdModulo,
+                    rp.Leer,
+                    rp.Crear,
+                    rp.Editar,
+                    rp.Eliminar
+                })
                 .ToListAsync();
 
             return Ok(permisos);

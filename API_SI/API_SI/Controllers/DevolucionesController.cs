@@ -40,7 +40,11 @@ namespace API_SI.Controllers
                     d.Reingreso,
                     d.Estado,
                     IdVenta = d.IdVenta,
-                    Trabajador = d.Trabajador.Nombre
+                    Trabajador = d.Trabajador.Nombre,
+                    ProductoNombre = d.DevolucionDetalles.Select(dd => dd.Producto.Nombre).FirstOrDefault() ?? "Varios",
+                    Cantidad = d.DevolucionDetalles.Sum(dd => dd.Cantidad),
+                    Motivo = d.DevolucionDetalles.Select(dd => dd.Motivo).FirstOrDefault() ?? d.Notas,
+                    Tipo = d.Reingreso ? "Devolucion" : "Merma"
                 })
                 .ToListAsync();
 

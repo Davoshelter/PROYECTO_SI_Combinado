@@ -21,15 +21,32 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (usuario, contrasena) => {
-    const res = await api.post('/auth/login', { usuario, contrasena });
-    const { token, trabajador, permisos: perms } = res.data;
+    const res = await api.post('/auth/login', {
+      email: usuario,
+      password: contrasena
+    });
+    const { token, nombre, email, rol, permisos: perms } = res.data;
+
+    const trabajador = {
+      nombre,
+      email,
+      rolNombre: rol
+    };
+
+    const permsMapped = (perms || []).map(p => ({
+      modulo: p.moduloClave,
+      leer: p.leer,
+      crear: p.crear,
+      editar: p.editar,
+      eliminar: p.eliminar
+    }));
 
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(trabajador));
-    localStorage.setItem('permisos', JSON.stringify(perms));
+    localStorage.setItem('permisos', JSON.stringify(permsMapped));
 
     setUser(trabajador);
-    setPermisos(perms);
+    setPermisos(permsMapped);
     return res.data;
   };
 

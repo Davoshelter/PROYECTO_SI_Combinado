@@ -22,7 +22,7 @@ namespace API_SI.Models
         public DateTimeOffset ActualizadoEn { get; set; } = DateTimeOffset.UtcNow;
 
         // Navigation
-        public Categoria Categoria { get; set; } = null!;
+        public Categoria? Categoria { get; set; }
         public Proveedor? Proveedor { get; set; }
         public ICollection<VentaDetalle> VentaDetalles { get; set; } = new List<VentaDetalle>();
         public ICollection<OrdenCompraDetalle> OrdenCompraDetalles { get; set; } = new List<OrdenCompraDetalle>();

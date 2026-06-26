@@ -13,7 +13,7 @@ export default function Clientes() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ nombre: '', ci: '', celular: '', email: '', direccion: '' });
+  const [form, setForm] = useState({ nombre: '', ci: '', telefono: '', email: '', direccion: '' });
   const { tienePermiso } = useAuth();
   const toast = useToast();
 
@@ -27,13 +27,13 @@ export default function Clientes() {
   const filtered = items.filter(c =>
     c.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
     c.ci?.includes(busqueda) ||
-    c.celular?.includes(busqueda)
+    c.telefono?.includes(busqueda)
   );
 
-  const openCreate = () => { setSelected(null); setForm({ nombre: '', ci: '', celular: '', email: '', direccion: '' }); setShowModal(true); };
+  const openCreate = () => { setSelected(null); setForm({ nombre: '', ci: '', telefono: '', email: '', direccion: '' }); setShowModal(true); };
   const openEdit = (item) => {
     setSelected(item);
-    setForm({ nombre: item.nombre||'', ci: item.ci||'', celular: item.celular||'', email: item.email||'', direccion: item.direccion||'' });
+    setForm({ nombre: item.nombre||'', ci: item.ci||'', telefono: item.telefono||'', email: item.email||'', direccion: item.direccion||'' });
     setShowModal(true);
   };
 
@@ -65,11 +65,11 @@ export default function Clientes() {
       </div>
       <div className="table-container">
         <table>
-          <thead><tr><th>Nombre</th><th>CI</th><th>Celular</th><th>Email</th><th>Dirección</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>Nombre</th><th>CI</th><th>Celular/Teléfono</th><th>Email</th><th>Dirección</th><th>Acciones</th></tr></thead>
           <tbody>
             {filtered.map(c=>(
               <tr key={c.id}>
-                <td><strong>{c.nombre}</strong></td><td>{c.ci||'—'}</td><td>{c.celular||'—'}</td>
+                <td><strong>{c.nombre}</strong></td><td>{c.ci||'—'}</td><td>{c.telefono||'—'}</td>
                 <td className="text-muted">{c.email||'—'}</td><td className="text-muted">{c.direccion||'—'}</td>
                 <td><div className="flex gap-sm">
                   {tienePermiso('Clientes','Editar') && <button className="btn btn-ghost btn-sm" onClick={()=>openEdit(c)}><Edit2 size={14}/></button>}
@@ -86,7 +86,7 @@ export default function Clientes() {
           <div className="form-group"><label>CI</label><input className="form-control" value={form.ci} onChange={e=>setForm({...form,ci:e.target.value})}/></div>
         </div>
         <div className="grid-2">
-          <div className="form-group"><label>Celular</label><input className="form-control" value={form.celular} onChange={e=>setForm({...form,celular:e.target.value})}/></div>
+          <div className="form-group"><label>Celular/Teléfono</label><input className="form-control" value={form.telefono} onChange={e=>setForm({...form,telefono:e.target.value})}/></div>
           <div className="form-group"><label>Email</label><input className="form-control" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></div>
         </div>
         <div className="form-group"><label>Dirección</label><input className="form-control" value={form.direccion} onChange={e=>setForm({...form,direccion:e.target.value})}/></div>

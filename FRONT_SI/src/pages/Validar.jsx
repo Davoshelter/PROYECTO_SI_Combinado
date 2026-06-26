@@ -26,7 +26,7 @@ export default function Validar() {
     setError('');
     setResult(null);
     try {
-      const res = await api.get(`/validar/${hashToUse}`);
+      const res = await api.get('/validar', { params: { qr: hashToUse } });
       setResult(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Documento no encontrado o inválido');
@@ -97,7 +97,7 @@ export default function Validar() {
             <div style={{ textAlign: 'left', marginTop: 16 }}>
               <div className="flex justify-between mb-1">
                 <span className="text-muted text-sm">Tipo:</span>
-                <strong>{result.tipo || 'Factura'}</strong>
+                <strong>{result.tipo === 'venta' ? 'Venta (Factura)' : result.tipo === 'cotizacion' ? 'Cotización' : (result.tipo || 'Documento')}</strong>
               </div>
               <div className="flex justify-between mb-1">
                 <span className="text-muted text-sm">Nro:</span>
@@ -105,16 +105,16 @@ export default function Validar() {
               </div>
               <div className="flex justify-between mb-1">
                 <span className="text-muted text-sm">Fecha:</span>
-                <span>{result.fecha ? new Date(result.fecha).toLocaleDateString('es-BO') : '—'}</span>
+                <span>{result.fecha || result.fechaCreacion ? new Date(result.fecha || result.fechaCreacion).toLocaleDateString('es-BO') : '—'}</span>
               </div>
               <div className="flex justify-between mb-1">
                 <span className="text-muted text-sm">Total:</span>
-                <strong style={{ color: 'var(--yellow-400)' }}>${result.totalUSD?.toFixed(2)}</strong>
+                <strong style={{ color: 'var(--yellow-400)' }}>${(result.total || result.totalUSD || 0).toFixed(2)}</strong>
               </div>
-              {result.cliente && (
+              {(result.cliente || result.clienteNombre) && (
                 <div className="flex justify-between">
                   <span className="text-muted text-sm">Cliente:</span>
-                  <span>{result.cliente}</span>
+                  <span>{result.cliente?.nombre || result.clienteNombre || '—'}</span>
                 </div>
               )}
             </div>

@@ -59,20 +59,20 @@ export default function Ventas() {
       </div>
       <div className="table-container">
         <table>
-          <thead><tr><th>#</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th><th>Método</th><th>Total USD</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>#</th><th>Fecha</th><th>Cliente</th><th>Vendedor</th><th>Método</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
           <tbody>
             {filtered.map(v=>(
               <tr key={v.id}>
                 <td><strong>#{v.id}</strong></td>
-                <td className="text-sm">{new Date(v.creadoEn).toLocaleString('es-BO')}</td>
-                <td>{v.clienteNombre||'General'}</td>
-                <td>{v.trabajadorNombre||'—'}</td>
+                <td className="text-sm">{new Date(v.fecha || v.creadoEn).toLocaleString('es-BO')}</td>
+                <td>{v.cliente || v.clienteNombre || 'General'}</td>
+                <td>{v.trabajador || v.trabajadorNombre || '—'}</td>
                 <td><span className="badge badge-info">{v.metodoPago}</span></td>
-                <td style={{fontWeight:700, color:'var(--yellow-400)'}}>${v.totalUSD?.toFixed(2)}</td>
+                <td style={{fontWeight:700, color:'var(--yellow-400)'}}>${(v.total || v.totalUSD)?.toFixed(2)}</td>
                 <td><span className={`badge ${estadoColor(v.estado)}`}>{v.estado}</span></td>
                 <td><div className="flex gap-sm">
                   <button className="btn btn-ghost btn-sm" onClick={()=>{setSelected(v);setShowDetail(true);}}><Eye size={14}/></button>
-                  {tienePermiso('Ventas','Eliminar') && v.estado !== 'Anulada' && (
+                  {tienePermiso('Ventas','Eliminar') && v.estado !== 'Anulada' && v.estado !== 'cancelada' && (
                     <button className="btn btn-ghost btn-sm" style={{color:'var(--danger)'}} onClick={()=>{setSelected(v);setShowConfirm(true);}}><XCircle size={14}/></button>
                   )}
                 </div></td>
@@ -87,10 +87,10 @@ export default function Ventas() {
         {selected && (
           <>
             <div className="grid-2 mb-2">
-              <div><span className="text-muted text-sm">Cliente:</span> <strong>{selected.clienteNombre||'General'}</strong></div>
-              <div><span className="text-muted text-sm">Método:</span> <strong>{selected.metodoPago}</strong></div>
-              <div><span className="text-muted text-sm">Fecha:</span> {new Date(selected.creadoEn).toLocaleString('es-BO')}</div>
-              <div><span className="text-muted text-sm">Descuento:</span> {selected.descuentoPorcentaje||0}%</div>
+              <div><span className="text-muted text-sm">Cliente:</span> <strong>{selected.cliente?.nombre || selected.clienteNombre || 'General'}</strong></div>
+              <div><span className="text-muted text-sm">Método:</span> <strong>{selected.metodoPago?.nombre || selected.metodoPago}</strong></div>
+              <div><span className="text-muted text-sm">Fecha:</span> {new Date(selected.fecha || selected.creadoEn).toLocaleString('es-BO')}</div>
+              <div><span className="text-muted text-sm">Descuento:</span> {selected.descuento || selected.descuentoPorcentaje || 0}%</div>
             </div>
             <div className="table-container">
               <table>
@@ -98,17 +98,16 @@ export default function Ventas() {
                 <tbody>
                   {selected.detalles?.map((d,i)=>(
                     <tr key={i}>
-                      <td>{d.productoNombre||`#${d.productoId}`}</td><td>{d.cantidad}</td>
-                      <td>${d.precioUnitarioUSD?.toFixed(2)}</td>
-                      <td style={{fontWeight:600}}>${(d.cantidad*d.precioUnitarioUSD).toFixed(2)}</td>
+                      <td>{d.producto?.nombre || d.productoNombre || `#${d.productoId}`}</td><td>{d.cantidad}</td>
+                      <td>${(d.precioUnitario || d.precioUnitarioUSD)?.toFixed(2)}</td>
+                      <td style={{fontWeight:600}}>${(d.cantidad * (d.precioUnitario || d.precioUnitarioUSD)).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <div className="cart-summary" style={{marginTop:16, borderRadius:'var(--radius-sm)'}}>
-              <div className="summary-row total"><span>TOTAL:</span><span>${selected.totalUSD?.toFixed(2)}</span></div>
-              {selected.totalBs > 0 && <div className="summary-row equiv"><span>En Bolivianos:</span><span>{selected.totalBs?.toFixed(2)} Bs</span></div>}
+              <div className="summary-row total"><span>TOTAL:</span><span>${(selected.total || selected.totalUSD)?.toFixed(2)}</span></div>
             </div>
           </>
         )}

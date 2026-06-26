@@ -13,7 +13,7 @@ export default function Categorias() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ nombre: '', descripcion: '' });
+  const [form, setForm] = useState({ nombre: '', descripcion: '', color: '#ff3b30', icono: 'tag' });
   const { tienePermiso } = useAuth();
   const toast = useToast();
 
@@ -27,8 +27,8 @@ export default function Categorias() {
 
   const filtered = items.filter(c => c.nombre?.toLowerCase().includes(busqueda.toLowerCase()));
 
-  const openCreate = () => { setSelected(null); setForm({ nombre: '', descripcion: '' }); setShowModal(true); };
-  const openEdit = (item) => { setSelected(item); setForm({ nombre: item.nombre || '', descripcion: item.descripcion || '' }); setShowModal(true); };
+  const openCreate = () => { setSelected(null); setForm({ nombre: '', descripcion: '', color: '#ff3b30', icono: 'tag' }); setShowModal(true); };
+  const openEdit = (item) => { setSelected(item); setForm({ nombre: item.nombre || '', descripcion: item.descripcion || '', color: item.color || '#ff3b30', icono: item.icono || 'tag' }); setShowModal(true); };
 
   const handleSave = async () => {
     if (!form.nombre.trim()) { toast.error('El nombre es requerido'); return; }
@@ -63,10 +63,19 @@ export default function Categorias() {
       </div>
       <div className="table-container">
         <table>
-          <thead><tr><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>Color/Icono</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
           <tbody>
             {filtered.map(c => (
               <tr key={c.id}>
+                <td>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: c.color || '#ff3b30', color: '#fff', fontSize: 11, fontWeight: 'bold'
+                  }}>
+                    {c.icono?.substring(0, 3) || 'cat'}
+                  </span>
+                </td>
                 <td><strong>{c.nombre}</strong></td>
                 <td className="text-muted">{c.descripcion || '—'}</td>
                 <td>
@@ -84,8 +93,14 @@ export default function Categorias() {
         <div className="form-group"><label>Nombre *</label>
           <input className="form-control" value={form.nombre} onChange={e => setForm({...form, nombre: e.target.value})} /></div>
         <div className="form-group"><label>Descripción</label>
-          <textarea className="form-control" rows={3} value={form.descripcion} onChange={e => setForm({...form, descripcion: e.target.value})} /></div>
-        <div className="modal-footer">
+          <textarea className="form-control" rows={2} value={form.descripcion} onChange={e => setForm({...form, descripcion: e.target.value})} /></div>
+        <div className="grid-2" style={{ marginTop: 12 }}>
+          <div className="form-group"><label>Icono *</label>
+            <input className="form-control" value={form.icono} onChange={e => setForm({...form, icono: e.target.value})} placeholder="Ej. tag, box, tv" /></div>
+          <div className="form-group"><label>Color *</label>
+            <input type="color" className="form-control" style={{ height: 38, padding: '2px 8px' }} value={form.color} onChange={e => setForm({...form, color: e.target.value})} /></div>
+        </div>
+        <div className="modal-footer" style={{ marginTop: 20 }}>
           <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
           <button className="btn btn-fire" onClick={handleSave}>{selected ? 'Actualizar' : 'Crear'}</button>
         </div>

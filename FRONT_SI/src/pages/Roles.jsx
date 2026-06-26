@@ -33,16 +33,41 @@ export default function Roles() {
   };
 
   const getPermiso = (moduloId) => {
-    return permisos.find(p => p.moduloId === moduloId) || { leer: false, crear: false, editar: false, eliminar: false };
+    const found = permisos.find(p => p.idModulo === moduloId || p.idmodulo === moduloId || p.IdModulo === moduloId);
+    if (!found) return { leer: false, crear: false, editar: false, eliminar: false };
+    return {
+      leer: found.leer !== undefined ? found.leer : (found.Leer !== undefined ? found.Leer : false),
+      crear: found.crear !== undefined ? found.crear : (found.Crear !== undefined ? found.Crear : false),
+      editar: found.editar !== undefined ? found.editar : (found.Editar !== undefined ? found.Editar : false),
+      eliminar: found.eliminar !== undefined ? found.eliminar : (found.Eliminar !== undefined ? found.Eliminar : false),
+    };
   };
 
   const togglePermiso = (moduloId, accion) => {
     setPermisos(prev => {
-      const existing = prev.find(p => p.moduloId === moduloId);
+      const existing = prev.find(p => p.idModulo === moduloId || p.idmodulo === moduloId || p.IdModulo === moduloId);
+      const pascalAcc = accion.charAt(0).toUpperCase() + accion.slice(1);
       if (existing) {
-        return prev.map(p => p.moduloId === moduloId ? {...p, [accion]: !p[accion]} : p);
+        return prev.map(p => {
+          if (p.idModulo === moduloId || p.idmodulo === moduloId || p.IdModulo === moduloId) {
+            return {
+              ...p,
+              [accion]: p[accion] !== undefined ? !p[accion] : (p[pascalAcc] !== undefined ? !p[pascalAcc] : true),
+              [pascalAcc]: p[pascalAcc] !== undefined ? !p[pascalAcc] : (p[accion] !== undefined ? !p[accion] : true),
+            };
+          }
+          return p;
+        });
       }
-      return [...prev, { moduloId, rolId: selectedRol.id, leer: false, crear: false, editar: false, eliminar: false, [accion]: true }];
+      return [...prev, {
+        idModulo: moduloId,
+        idmodulo: moduloId,
+        IdModulo: moduloId,
+        idRol: selectedRol.id,
+        leer: false, crear: false, editar: false, eliminar: false,
+        [accion]: true,
+        [pascalAcc]: true
+      }];
     });
   };
 
@@ -50,12 +75,12 @@ export default function Roles() {
     if (!selectedRol) return;
     try {
       await api.put(`/permiso/rol/${selectedRol.id}`, permisos.map(p => ({
-        moduloId: p.moduloId,
-        rolId: selectedRol.id,
-        leer: p.leer || false,
-        crear: p.crear || false,
-        editar: p.editar || false,
-        eliminar: p.eliminar || false,
+        idModulo: p.idModulo || p.idmodulo || p.IdModulo,
+        idRol: selectedRol.id,
+        leer: p.leer !== undefined ? p.leer : (p.Leer !== undefined ? p.Leer : false),
+        crear: p.crear !== undefined ? p.crear : (p.Crear !== undefined ? p.Crear : false),
+        editar: p.editar !== undefined ? p.editar : (p.Editar !== undefined ? p.Editar : false),
+        eliminar: p.eliminar !== undefined ? p.eliminar : (p.Eliminar !== undefined ? p.Eliminar : false),
       })));
       toast.success('Permisos guardados exitosamente');
     } catch (err) { toast.error(err.response?.data?.message || 'Error al guardar permisos'); }

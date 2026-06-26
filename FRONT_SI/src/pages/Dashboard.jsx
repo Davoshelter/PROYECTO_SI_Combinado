@@ -63,30 +63,29 @@ export default function Dashboard() {
       // Calculate stats
       const hoy = new Date().toISOString().split('T')[0];
       const ventasHoy = ventas.filter(
-        (v) => v.creadoEn?.split('T')[0] === hoy && v.estado !== 'Anulada'
+        (v) => (v.fecha || v.creadoEn)?.split('T')[0] === hoy && v.estado !== 'Anulada' && v.estado !== 'cancelada'
       );
-      const totalHoy = ventasHoy.reduce((s, v) => s + (v.totalUSD || 0), 0);
-      const activos = productos.filter((p) => p.activo !== false);
+      const totalHoy = ventasHoy.reduce((s, v) => s + (v.total || v.totalUSD || 0), 0);
+      const activos = productos.filter((p) => p.estado === 'activo' || p.activo !== false);
       const bajoStock = activos.filter((p) => p.stock <= (p.stockMinimo || 5));
 
       // Weekly sales data
-      const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
       const weekData = Array(7).fill(0);
       const now = new Date();
       ventas
-        .filter((v) => v.estado !== 'Anulada')
+        .filter((v) => v.estado !== 'Anulada' && v.estado !== 'cancelada')
         .forEach((v) => {
-          const d = new Date(v.creadoEn);
+          const d = new Date(v.fecha || v.creadoEn);
           const diffDays = Math.floor((now - d) / (1000 * 60 * 60 * 24));
           if (diffDays < 7) {
-            weekData[d.getDay()] += v.totalUSD || 0;
+            weekData[d.getDay()] += v.total || v.totalUSD || 0;
           }
         });
 
       // Top products by sale count (from details — simplified by name)
       const prodCount = {};
       ventas
-        .filter((v) => v.estado !== 'Anulada' && v.detalles)
+        .filter((v) => v.estado !== 'Anulada' && v.estado !== 'cancelada' && v.detalles)
         .forEach((v) => {
           v.detalles.forEach((d) => {
             const name = d.productoNombre || `Prod #${d.productoId}`;
@@ -99,7 +98,7 @@ export default function Dashboard() {
 
       setStats({
         ventasHoy: totalHoy,
-        totalVentas: ventas.filter((v) => v.estado !== 'Anulada').length,
+        totalVentas: ventas.filter((v) => v.estado !== 'Anulada' && v.estado !== 'cancelada').length,
         productosActivos: activos.length,
         clientesRegistrados: clientes.length,
       });

@@ -60,6 +60,10 @@ namespace API_SI.Controllers
         [HttpPost]
         public async Task<ActionResult<Cliente>> Create([FromBody] Cliente cliente)
         {
+            if (string.IsNullOrEmpty(cliente.Tipo))
+            {
+                cliente.Tipo = "normal";
+            }
             cliente.FechaRegistro = DateOnly.FromDateTime(DateTime.UtcNow);
             cliente.CreadoEn = DateTimeOffset.UtcNow;
             cliente.ActualizadoEn = DateTimeOffset.UtcNow;
@@ -86,7 +90,7 @@ namespace API_SI.Controllers
             cliente.Telefono = input.Telefono;
             cliente.CI = input.CI;
             cliente.Direccion = input.Direccion;
-            cliente.Tipo = input.Tipo;
+            cliente.Tipo = string.IsNullOrEmpty(input.Tipo) ? "normal" : input.Tipo;
             cliente.Puntos = input.Puntos;
             cliente.ActualizadoEn = DateTimeOffset.UtcNow;
 
