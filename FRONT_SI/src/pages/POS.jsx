@@ -25,7 +25,7 @@ export default function POS() {
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastVenta, setLastVenta] = useState(null);
   const [clienteBusqueda, setClienteBusqueda] = useState('');
-  const [nuevoCliente, setNuevoCliente] = useState({ nombre: '', ci: '', celular: '' });
+  const [nuevoCliente, setNuevoCliente] = useState({ nombre: '', ci: '', telefono: '' });
   const [loading, setLoading] = useState(false);
   const searchRef = useRef(null);
   const toast = useToast();
@@ -79,7 +79,7 @@ export default function POS() {
         {
           productoId: producto.id,
           nombre: producto.nombre,
-          precioUnitarioUSD: producto.precioVentaUSD,
+          precioUnitarioUSD: producto.precioVenta || producto.precioVentaUSD,
           cantidad: 1,
           stock: producto.stock,
         },
@@ -130,7 +130,7 @@ export default function POS() {
       setClientes((prev) => [...prev, res.data]);
       setClienteSeleccionado(res.data);
       setShowClienteModal(false);
-      setNuevoCliente({ nombre: '', ci: '', celular: '' });
+      setNuevoCliente({ nombre: '', ci: '', telefono: '' });
       toast.success('Cliente registrado');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error al registrar cliente');
@@ -151,21 +151,39 @@ export default function POS() {
     }
     setLoading(true);
     try {
+      // Map payment method name to database seed ID (1 = efectivo, 2 = transferencia, 3 = delivery)
+      let idMetodoPago = 1;
+      if (metodoPago === 'Tarjeta' || metodoPago === 'Transferencia' || metodoPago === 'QR' || metodoPago === 'Mixto') {
+        idMetodoPago = 2;
+      } else if (metodoPago === 'Delivery') {
+        idMetodoPago = 3;
+      }
+
+      // Ensure idCliente is resolved (default to first available client or 1)
+      const idCliente = clienteSeleccionado?.id || (clientes.length > 0 ? clientes[0].id : 1);
+
       const body = {
-        clienteId: clienteSeleccionado?.id || null,
-        metodoPago,
-        descuentoPorcentaje: descuento,
-        esDelivery,
-        costoDeliveryUSD: esDelivery ? costoDelivery : 0,
-        tipoCambioBs: tipoCambio,
+        idCliente: idCliente,
+        idMetodoPago: idMetodoPago,
+        subtotal: subtotalUSD,
+        descuento: descuento,
+        montoDescuento: descuentoMonto,
+        impuesto: 0,
+        total: totalUSD,
+        efectivoRecibido: totalUSD,
+        direccionEnvio: esDelivery ? 'Delivery' : null,
         detalles: carrito.map((c) => ({
-          productoId: c.productoId,
+          idProducto: c.productoId,
           cantidad: c.cantidad,
-          precioUnitarioUSD: c.precioUnitarioUSD,
+          precioUnitario: c.precioUnitarioUSD,
         })),
       };
       const res = await api.post('/pos/vender', body);
-      setLastVenta(res.data);
+      setLastVenta({
+        id: res.data.id,
+        totalUSD: totalUSD,
+        hashQR: res.data.hashQR
+      });
       setShowCheckoutModal(false);
       setShowReceiptModal(true);
       setCarrito([]);
@@ -226,7 +244,7 @@ export default function POS() {
                 onClick={() => addToCart(p)}
               >
                 <div className="product-name">{p.nombre}</div>
-                <div className="product-price">{convertPrice(p.precioVentaUSD)}</div>
+                <div className="product-price">{convertPrice(p.precioVenta || p.precioVentaUSD)}</div>
                 <div className={`product-stock ${p.stock <= (p.stockMinimo || 5) ? 'low' : ''}`}>
                   Stock: {p.stock}
                 </div>
@@ -372,9 +390,9 @@ export default function POS() {
             </div>
           </div>
           <div className="form-group">
-            <label>Celular</label>
-            <input className="form-control" value={nuevoCliente.celular}
-              onChange={(e) => setNuevoCliente({ ...nuevoCliente, celular: e.target.value })} />
+            <label>Celular/Teléfono</label>
+            <input className="form-control" value={nuevoCliente.telefono}
+              onChange={(e) => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })} />
           </div>
           <button className="btn btn-fire w-full" onClick={handleClienteExpress}>
             <Plus size={16} /> Registrar y Seleccionar

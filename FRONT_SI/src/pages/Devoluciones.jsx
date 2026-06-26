@@ -29,12 +29,33 @@ export default function Devoluciones() {
   const handleSave = async () => {
     if (!form.ventaId || !form.productoId) { toast.error('Complete los campos requeridos'); return; }
     try {
+      // 1. Fetch sale details to get the product unit price
+      const ventaRes = await api.get(`/venta/${form.ventaId}`);
+      const venta = ventaRes.data;
+      
+      // 2. Find the product in the sale details
+      const detalleOriginal = venta.detalles?.find(d => d.productoId === Number(form.productoId) || d.producto?.id === Number(form.productoId));
+      if (!detalleOriginal) {
+        toast.error('El producto no pertenece a la venta original');
+        return;
+      }
+      
+      const precioUnitario = detalleOriginal.precioUnitario || detalleOriginal.precioUnitarioUSD || 0;
+      const totalReembolso = Number(form.cantidad) * precioUnitario;
+
+      // 3. Post to devolucion
       await api.post('/devolucion', {
-        ventaId: Number(form.ventaId),
-        productoId: Number(form.productoId),
-        cantidad: Number(form.cantidad),
-        motivo: form.motivo,
-        tipo: form.tipo,
+        idVenta: Number(form.ventaId),
+        total: totalReembolso,
+        metodoReembolso: 'efectivo',
+        reingreso: form.tipo === 'Devolucion',
+        notas: form.motivo,
+        detalles: [{
+          idProducto: Number(form.productoId),
+          cantidad: Number(form.cantidad),
+          precioUnitario: precioUnitario,
+          motivo: form.motivo || 'Devolución'
+        }]
       });
       toast.success('Devolución registrada');
       setShowModal(false);
@@ -62,8 +83,8 @@ export default function Devoluciones() {
             {filtered.map(d=>(
               <tr key={d.id}>
                 <td><strong>#{d.id}</strong></td>
-                <td className="text-sm">{new Date(d.creadoEn).toLocaleDateString('es-BO')}</td>
-                <td>#{d.ventaId}</td>
+                <td className="text-sm">{new Date(d.fecha || d.creadoEn).toLocaleDateString('es-BO')}</td>
+                <td>#{d.idVenta || d.ventaId}</td>
                 <td>{d.productoNombre||`#${d.productoId}`}</td>
                 <td>{d.cantidad}</td>
                 <td><span className={`badge ${d.tipo==='Devolucion'?'badge-info':'badge-warning'}`}>{d.tipo}</span></td>

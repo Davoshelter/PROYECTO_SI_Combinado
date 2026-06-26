@@ -17,6 +17,7 @@ export default function Productos() {
   const [form, setForm] = useState({
     nombre: '', descripcion: '', codigoBarras: '', precioCompraUSD: 0,
     precioVentaUSD: 0, stock: 0, stockMinimo: 5, categoriaId: '', activo: true,
+    unidad: 'und'
   });
   const { tienePermiso } = useAuth();
   const toast = useToast();
@@ -35,13 +36,13 @@ export default function Productos() {
 
   const filtered = items.filter(p =>
     p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-    p.codigoBarras?.toLowerCase().includes(busqueda.toLowerCase())
+    (p.codigo || p.codigoBarras)?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   const openCreate = () => {
     setSelected(null);
     setForm({ nombre: '', descripcion: '', codigoBarras: '', precioCompraUSD: 0,
-      precioVentaUSD: 0, stock: 0, stockMinimo: 5, categoriaId: categorias[0]?.id || '', activo: true });
+      precioVentaUSD: 0, stock: 0, stockMinimo: 5, categoriaId: categorias[0]?.id || '', activo: true, unidad: 'und' });
     setShowModal(true);
   };
 
@@ -49,20 +50,30 @@ export default function Productos() {
     setSelected(item);
     setForm({
       nombre: item.nombre || '', descripcion: item.descripcion || '',
-      codigoBarras: item.codigoBarras || '', precioCompraUSD: item.precioCompraUSD || 0,
-      precioVentaUSD: item.precioVentaUSD || 0, stock: item.stock || 0,
-      stockMinimo: item.stockMinimo || 5, categoriaId: item.categoriaId || '',
-      activo: item.activo !== false,
+      codigoBarras: item.codigo || item.codigoBarras || '', precioCompraUSD: item.precioCompra || item.precioCompraUSD || 0,
+      precioVentaUSD: item.precioVenta || item.precioVentaUSD || 0, stock: item.stock || 0,
+      stockMinimo: item.stockMinimo || 5, categoriaId: item.idCategoria || item.categoriaId || '',
+      activo: item.estado === 'activo' || item.activo !== false, unidad: item.unidad || 'und'
     });
     setShowModal(true);
   };
 
   const handleSave = async () => {
     if (!form.nombre.trim()) { toast.error('El nombre es requerido'); return; }
+    if (!form.codigoBarras.trim()) { toast.error('El código es requerido'); return; }
     try {
-      const body = { ...form, categoriaId: form.categoriaId ? Number(form.categoriaId) : null,
-        precioCompraUSD: Number(form.precioCompraUSD), precioVentaUSD: Number(form.precioVentaUSD),
-        stock: Number(form.stock), stockMinimo: Number(form.stockMinimo) };
+      const body = {
+        nombre: form.nombre,
+        codigo: form.codigoBarras,
+        idCategoria: form.categoriaId ? Number(form.categoriaId) : null,
+        precioCompra: Number(form.precioCompraUSD),
+        precioVenta: Number(form.precioVentaUSD),
+        stock: Number(form.stock),
+        stockMinimo: Number(form.stockMinimo),
+        estado: form.activo ? 'activo' : 'inactivo',
+        unidad: form.unidad || 'und',
+        descripcion: form.descripcion || '',
+      };
       if (selected) {
         await api.put(`/producto/${selected.id}`, body);
         toast.success('Producto actualizado');
@@ -115,17 +126,17 @@ export default function Productos() {
             {filtered.map(p => (
               <tr key={p.id}>
                 <td><strong>{p.nombre}</strong></td>
-                <td className="text-muted">{p.codigoBarras || '—'}</td>
-                <td>{p.categoriaNombre || '—'}</td>
-                <td>${p.precioCompraUSD?.toFixed(2)}</td>
-                <td style={{ fontWeight: 600, color: 'var(--yellow-400)' }}>${p.precioVentaUSD?.toFixed(2)}</td>
+                <td className="text-muted">{p.codigo || p.codigoBarras || '—'}</td>
+                <td>{p.categoria?.nombre || p.categoriaNombre || '—'}</td>
+                <td>${(p.precioCompra || p.precioCompraUSD)?.toFixed(2)}</td>
+                <td style={{ fontWeight: 600, color: 'var(--yellow-400)' }}>${(p.precioVenta || p.precioVentaUSD)?.toFixed(2)}</td>
                 <td>
                   <span className={`badge ${p.stock <= (p.stockMinimo||5) ? (p.stock === 0 ? 'badge-danger' : 'badge-warning') : 'badge-success'}`}>
                     {p.stock}
                   </span>
                 </td>
-                <td><span className={`badge ${p.activo !== false ? 'badge-success' : 'badge-danger'}`}>
-                  {p.activo !== false ? 'Activo' : 'Inactivo'}
+                <td><span className={`badge ${(p.estado === 'activo' || p.activo !== false) ? 'badge-success' : 'badge-danger'}`}>
+                  {(p.estado === 'activo' || p.activo !== false) ? 'Activo' : 'Inactivo'}
                 </span></td>
                 <td>
                   <div className="flex gap-sm">
@@ -151,19 +162,27 @@ export default function Productos() {
           <div className="form-group"><label>Nombre *</label>
             <input className="form-control" value={form.nombre}
               onChange={e => setForm({...form, nombre: e.target.value})} /></div>
-          <div className="form-group"><label>Código de Barras</label>
+          <div className="form-group"><label>Código de Barras *</label>
             <input className="form-control" value={form.codigoBarras}
               onChange={e => setForm({...form, codigoBarras: e.target.value})} /></div>
         </div>
         <div className="form-group"><label>Descripción</label>
           <textarea className="form-control" rows={2} value={form.descripcion}
             onChange={e => setForm({...form, descripcion: e.target.value})} /></div>
-        <div className="grid-2">
+        <div className="grid-3">
           <div className="form-group"><label>Categoría</label>
             <select className="form-control" value={form.categoriaId}
               onChange={e => setForm({...form, categoriaId: e.target.value})}>
               <option value="">Sin categoría</option>
               {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+            </select></div>
+          <div className="form-group"><label>Unidad *</label>
+            <select className="form-control" value={form.unidad}
+              onChange={e => setForm({...form, unidad: e.target.value})}>
+              <option value="und">Unidad (und)</option>
+              <option value="kg">Kilogramo (kg)</option>
+              <option value="lt">Litro (lt)</option>
+              <option value="gr">Gramo (gr)</option>
             </select></div>
           <div className="form-group"><label>Estado</label>
             <select className="form-control" value={form.activo ? 'true' : 'false'}

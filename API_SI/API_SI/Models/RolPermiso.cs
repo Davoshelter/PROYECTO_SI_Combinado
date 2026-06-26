@@ -11,7 +11,7 @@ namespace API_SI.Models
         public bool Eliminar { get; set; }
 
         // Navigation
-        public Rol Rol { get; set; } = null!;
-        public Modulo Modulo { get; set; } = null!;
+        public Rol? Rol { get; set; }
+        public Modulo? Modulo { get; set; }
     }
 }

@@ -5,8 +5,13 @@ import { useToast } from '../components/Toast';
 
 export default function Configuracion() {
   const [config, setConfig] = useState({
-    nombreNegocio: '', direccion: '', telefono: '', nit: '',
-    tipoCambioBs: 1, monedaPrincipal: 'USD', logoUrl: '',
+    nombre: '', razonSocial: '', ruc: '', direccion: '', ciudad: '', pais: '',
+    telefono: '', celular: '', email: '', sitioWeb: '', regimenTributario: '',
+    logoImagen: '', iva: 0, prefijoFactura: 'F', secuencialFactura: 1,
+    secuencialCotizacion: 1, monedaBase: 'USD', simboloMoneda: '$',
+    monedaVisualizacion: 'USD', tipoCambio: 1, mensajeRecibo: '', pieFactura: '',
+    plantillaRecibo: 'T1', plantillaCotizacion: 'T1', codigoPaisWhatsapp: '591',
+    mensajeWhatsapp: '', claveFirmaDigital: ''
   });
   const [loading, setLoading] = useState(true);
   const toast = useToast();
@@ -26,7 +31,10 @@ export default function Configuracion() {
     try {
       await api.put('/configuracion', {
         ...config,
-        tipoCambioBs: Number(config.tipoCambioBs),
+        tipoCambio: Number(config.tipoCambio),
+        iva: Number(config.iva),
+        secuencialFactura: Number(config.secuencialFactura),
+        secuencialCotizacion: Number(config.secuencialCotizacion)
       });
       toast.success('Configuración guardada exitosamente');
     } catch (err) { toast.error(err.response?.data?.message || 'Error al guardar'); }
@@ -50,18 +58,18 @@ export default function Configuracion() {
 
         <div className="grid-2">
           <div className="form-group"><label>Nombre del Negocio</label>
-            <input className="form-control" value={config.nombreNegocio}
-              onChange={e=>setConfig({...config, nombreNegocio: e.target.value})}/></div>
-          <div className="form-group"><label>NIT</label>
-            <input className="form-control" value={config.nit}
-              onChange={e=>setConfig({...config, nit: e.target.value})}/></div>
+            <input className="form-control" value={config.nombre}
+              onChange={e=>setConfig({...config, nombre: e.target.value})}/></div>
+          <div className="form-group"><label>NIT / RUC</label>
+            <input className="form-control" value={config.ruc || ''}
+              onChange={e=>setConfig({...config, ruc: e.target.value})}/></div>
         </div>
         <div className="grid-2">
           <div className="form-group"><label>Teléfono</label>
-            <input className="form-control" value={config.telefono}
+            <input className="form-control" value={config.telefono || ''}
               onChange={e=>setConfig({...config, telefono: e.target.value})}/></div>
           <div className="form-group"><label>Dirección</label>
-            <input className="form-control" value={config.direccion}
+            <input className="form-control" value={config.direccion || ''}
               onChange={e=>setConfig({...config, direccion: e.target.value})}/></div>
         </div>
 
@@ -70,27 +78,27 @@ export default function Configuracion() {
             💱 Moneda y Tipo de Cambio
           </h3>
           <div className="grid-2">
-            <div className="form-group"><label>Moneda Principal</label>
-              <select className="form-control" value={config.monedaPrincipal}
-                onChange={e=>setConfig({...config, monedaPrincipal: e.target.value})}>
+            <div className="form-group"><label>Moneda Visualización</label>
+              <select className="form-control" value={config.monedaVisualizacion}
+                onChange={e=>setConfig({...config, monedaVisualizacion: e.target.value})}>
                 <option value="USD">USD (Dólares)</option>
                 <option value="Bs">Bs (Bolivianos)</option>
               </select></div>
             <div className="form-group"><label>Tipo de Cambio (1 USD = X Bs)</label>
               <input type="number" className="form-control" min="0" step="0.01"
-                value={config.tipoCambioBs}
-                onChange={e=>setConfig({...config, tipoCambioBs: e.target.value})}/></div>
+                value={config.tipoCambio}
+                onChange={e=>setConfig({...config, tipoCambio: e.target.value})}/></div>
           </div>
         </div>
 
         <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 20, marginTop: 12 }}>
           <div className="form-group"><label>URL del Logo</label>
-            <input className="form-control" value={config.logoUrl}
-              onChange={e=>setConfig({...config, logoUrl: e.target.value})}
+            <input className="form-control" value={config.logoImagen || ''}
+              onChange={e=>setConfig({...config, logoImagen: e.target.value})}
               placeholder="https://ejemplo.com/logo.png"/></div>
-          {config.logoUrl && (
+          {config.logoImagen && (
             <div style={{ marginTop: 8, padding: 12, background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
-              <img src={config.logoUrl} alt="Logo" style={{ maxHeight: 80, objectFit: 'contain' }}
+              <img src={config.logoImagen} alt="Logo" style={{ maxHeight: 80, objectFit: 'contain' }}
                 onError={e => e.target.style.display = 'none'} />
             </div>
           )}

@@ -21,7 +21,7 @@ namespace API_SI.Models
         public DateTimeOffset ActualizadoEn { get; set; } = DateTimeOffset.UtcNow;
 
         // Navigation
-        public Rol Rol { get; set; } = null!;
+        public Rol? Rol { get; set; }
         public ICollection<HistorialTipoCambio> HistorialTipoCambios { get; set; } = new List<HistorialTipoCambio>();
         public ICollection<Venta> Ventas { get; set; } = new List<Venta>();
         public ICollection<SesionCaja> SesionesCaja { get; set; } = new List<SesionCaja>();

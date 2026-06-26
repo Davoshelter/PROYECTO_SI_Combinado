@@ -17,16 +17,16 @@ export default function Inventario() {
   };
 
   const filtered = items.filter(m =>
-    m.productoNombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+    (m.producto || m.productoNombre)?.toLowerCase().includes(busqueda.toLowerCase()) ||
     m.tipo?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   const tipoColor = (tipo) => {
-    switch(tipo) {
-      case 'Entrada': case 'CompraEntrada': return 'badge-success';
-      case 'Salida': case 'VentaSalida': return 'badge-danger';
-      case 'Devolucion': return 'badge-info';
-      case 'Merma': return 'badge-warning';
+    switch(tipo?.toLowerCase()) {
+      case 'entrada': case 'compraentrada': return 'badge-success';
+      case 'salida': case 'ventasalida': return 'badge-danger';
+      case 'devolucion': return 'badge-info';
+      case 'merma': case 'ajuste': return 'badge-warning';
       default: return 'badge-info';
     }
   };
@@ -44,18 +44,18 @@ export default function Inventario() {
       </div>
       <div className="table-container">
         <table>
-          <thead><tr><th>#</th><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Referencia</th></tr></thead>
+          <thead><tr><th>#</th><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr></thead>
           <tbody>
             {filtered.map(m=>(
               <tr key={m.id}>
                 <td>#{m.id}</td>
-                <td className="text-sm">{new Date(m.creadoEn).toLocaleString('es-BO')}</td>
-                <td><strong>{m.productoNombre||`#${m.productoId}`}</strong></td>
+                <td className="text-sm">{new Date(m.fecha || m.creadoEn).toLocaleString('es-BO')}</td>
+                <td><strong>{m.producto || m.productoNombre || `—`}</strong></td>
                 <td><span className={`badge ${tipoColor(m.tipo)}`}>{m.tipo}</span></td>
                 <td style={{fontWeight:600, color: m.cantidad > 0 ? 'var(--success)' : 'var(--danger)'}}>
                   {m.cantidad > 0 ? '+' : ''}{m.cantidad}
                 </td>
-                <td className="text-muted text-sm">{m.referencia||'—'}</td>
+                <td className="text-muted text-sm">{m.motivo || m.referencia || '—'}</td>
               </tr>
             ))}
           </tbody>

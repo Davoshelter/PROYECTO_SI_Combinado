@@ -32,7 +32,7 @@ export default function Trabajadores() {
 
   const filtered = items.filter(t =>
     t.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-    t.usuario?.toLowerCase().includes(busqueda.toLowerCase())
+    t.email?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   const openCreate = () => {
@@ -42,19 +42,41 @@ export default function Trabajadores() {
   };
   const openEdit = (item) => {
     setSelected(item);
-    setForm({ nombre: item.nombre||'', ci: item.ci||'', celular: item.celular||'',
-      usuario: item.usuario||'', contrasena: '', rolId: item.rolId||'', activo: item.activo !== false });
+    setForm({
+      nombre: item.nombre||'',
+      ci: item.ci||'',
+      celular: item.telefono||'',
+      usuario: item.email||'',
+      contrasena: '',
+      rolId: item.idRol||'',
+      activo: item.estado === 'activo'
+    });
     setShowModal(true);
   };
 
   const handleSave = async () => {
-    if (!form.nombre.trim() || !form.usuario.trim()) { toast.error('Nombre y usuario son requeridos'); return; }
+    if (!form.nombre.trim() || !form.usuario.trim()) { toast.error('Nombre y correo son requeridos'); return; }
     if (!selected && !form.contrasena) { toast.error('La contraseña es requerida'); return; }
     try {
-      const body = { ...form, rolId: form.rolId ? Number(form.rolId) : null };
-      if (!body.contrasena) delete body.contrasena;
-      if (selected) { await api.put(`/trabajador/${selected.id}`, body); toast.success('Trabajador actualizado'); }
-      else { await api.post('/trabajador', body); toast.success('Trabajador creado'); }
+      const body = {
+        nombre: form.nombre,
+        idRol: form.rolId ? Number(form.rolId) : null,
+        email: form.usuario,
+        password: form.contrasena,
+        telefono: form.celular,
+        direccion: selected?.direccion || '',
+        estado: form.activo ? 'activo' : 'inactivo',
+        fechaIngreso: selected?.fechaIngreso || new Date().toISOString().split('T')[0],
+        salario: selected?.salario || 0
+      };
+      if (!body.password) delete body.password;
+      if (selected) {
+        await api.put(`/trabajador/${selected.id}`, body);
+        toast.success('Trabajador actualizado');
+      } else {
+        await api.post('/trabajador', body);
+        toast.success('Trabajador creado');
+      }
       setShowModal(false); loadData();
     } catch (err) { toast.error(err.response?.data?.message || 'Error al guardar'); }
   };
@@ -82,9 +104,11 @@ export default function Trabajadores() {
           <tbody>
             {filtered.map(t=>(
               <tr key={t.id}>
-                <td><strong>{t.nombre}</strong></td><td>{t.ci||'—'}</td><td>{t.usuario}</td>
-                <td><span className="badge badge-fire">{t.rolNombre||'Sin rol'}</span></td>
-                <td><span className={`badge ${t.activo!==false?'badge-success':'badge-danger'}`}>{t.activo!==false?'Activo':'Inactivo'}</span></td>
+                <td><strong>{t.nombre}</strong></td>
+                <td>{t.ci||'—'}</td>
+                <td>{t.email}</td>
+                <td><span className="badge badge-fire">{t.rol?.nombre || t.rolNombre || 'Sin rol'}</span></td>
+                <td><span className={`badge ${t.estado === 'activo' ? 'badge-success' : 'badge-danger'}`}>{t.estado === 'activo' ? 'Activo' : 'Inactivo'}</span></td>
                 <td><div className="flex gap-sm">
                   {tienePermiso('Trabajadores','Editar') && <button className="btn btn-ghost btn-sm" onClick={()=>openEdit(t)}><Edit2 size={14}/></button>}
                   {tienePermiso('Trabajadores','Eliminar') && <button className="btn btn-ghost btn-sm" style={{color:'var(--danger)'}} onClick={()=>{setSelected(t);setShowConfirm(true);}}><Trash2 size={14}/></button>}

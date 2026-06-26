@@ -11,7 +11,7 @@ namespace API_SI.Models
         public string? Telefono { get; set; }
         public string? CI { get; set; }
         public string? Direccion { get; set; }
-        public string Tipo { get; set; } = null!; // "normal","frecuente","vip"
+        public string? Tipo { get; set; } // "normal","frecuente","vip"
         public int Puntos { get; set; }
         public int TotalCompras { get; set; }
         public decimal TotalGastado { get; set; }

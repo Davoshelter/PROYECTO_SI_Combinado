@@ -56,13 +56,19 @@ export default function Cotizaciones() {
     try {
       await api.post('/cotizacion', {
         clienteNombre: form.clienteNombre,
-        clienteCelular: form.clienteCelular,
-        validezDias: Number(form.validezDias),
-        observacion: form.observacion,
+        clienteTelefono: form.clienteCelular,
+        descuentoGlobal: 0,
+        subtotal: totalCotizacion,
+        montoDescuento: 0,
+        total: totalCotizacion,
+        diasValidez: Number(form.validezDias),
+        plantilla: 'T1',
+        notas: form.observacion,
         detalles: form.detalles.map(d => ({
-          productoId: d.productoId,
+          idProducto: d.productoId,
           cantidad: d.cantidad,
-          precioUnitarioUSD: d.precioUnitarioUSD,
+          precioUnitario: d.precioUnitarioUSD,
+          descuento: 0,
         })),
       });
       toast.success('Cotización creada');
@@ -73,11 +79,14 @@ export default function Cotizaciones() {
   };
 
   const sendWhatsApp = (cot) => {
-    if (!cot.clienteCelular) { toast.warning('El cliente no tiene celular registrado'); return; }
+    const celular = cot.clienteTelefono || cot.clienteCelular;
+    if (!celular) { toast.warning('El cliente no tiene celular registrado'); return; }
+    const total = cot.total || cot.totalUSD;
+    const dias = cot.diasValidez || cot.validezDias;
     const msg = encodeURIComponent(
-      `Hola ${cot.clienteNombre}, le compartimos su cotización #${cot.id} por un total de $${cot.totalUSD?.toFixed(2)}. Válida por ${cot.validezDias} días. — ElectroShop`
+      `Hola ${cot.clienteNombre}, le compartimos su cotización #${cot.id} por un total de $${total?.toFixed(2)}. Válida por ${dias} días. — ElectroShop`
     );
-    window.open(`https://wa.me/591${cot.clienteCelular}?text=${msg}`, '_blank');
+    window.open(`https://wa.me/591${celular}?text=${msg}`, '_blank');
   };
 
   const filteredProds = productos.filter(p => p.nombre?.toLowerCase().includes(prodBusqueda.toLowerCase()));
@@ -96,18 +105,18 @@ export default function Cotizaciones() {
       </div>
       <div className="table-container">
         <table>
-          <thead><tr><th>#</th><th>Fecha</th><th>Cliente</th><th>Total USD</th><th>Validez</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>#</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Validez</th><th>Estado</th><th>Acciones</th></tr></thead>
           <tbody>
             {filtered.map(c=>(
               <tr key={c.id}>
                 <td><strong>#{c.id}</strong></td>
-                <td className="text-sm">{new Date(c.creadoEn).toLocaleDateString('es-BO')}</td>
+                <td className="text-sm">{new Date(c.fechaCreacion || c.creadoEn).toLocaleDateString('es-BO')}</td>
                 <td>{c.clienteNombre}</td>
-                <td style={{fontWeight:700,color:'var(--yellow-400)'}}>${c.totalUSD?.toFixed(2)}</td>
-                <td>{c.validezDias} días</td>
-                <td><span className={`badge ${c.estado==='Vigente'?'badge-success':'badge-warning'}`}>{c.estado||'Vigente'}</span></td>
+                <td style={{fontWeight:700,color:'var(--yellow-400)'}}>${(c.total || c.totalUSD)?.toFixed(2)}</td>
+                <td>{c.diasValidez || c.validezDias} días</td>
+                <td><span className={`badge ${c.estado==='pendiente'?'badge-warning':'badge-success'}`}>{c.estado||'pendiente'}</span></td>
                 <td><div className="flex gap-sm">
-                  {c.clienteCelular && <button className="btn btn-ghost btn-sm" style={{color:'#22c55e'}} onClick={()=>sendWhatsApp(c)} title="Enviar por WhatsApp"><Send size={14}/></button>}
+                  {(c.clienteTelefono || c.clienteCelular) && <button className="btn btn-ghost btn-sm" style={{color:'#22c55e'}} onClick={()=>sendWhatsApp(c)} title="Enviar por WhatsApp"><Send size={14}/></button>}
                 </div></td>
               </tr>
             ))}
