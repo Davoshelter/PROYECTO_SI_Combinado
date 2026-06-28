@@ -648,6 +648,35 @@
         }
       }
     },
+    "/api/Dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponseDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponseDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Devoluciones": {
       "get": {
         "tags": [
@@ -2623,6 +2652,24 @@
         },
         "additionalProperties": false
       },
+      "ChartPointDTO": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          },
+          "color": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "Cliente": {
         "type": "object",
         "properties": {
@@ -3290,6 +3337,127 @@
               "$ref": "#/components/schemas/VentaDetalleDto"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DashboardResponseDTO": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/DashboardSummaryDTO"
+          },
+          "ventas15Dias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartPointDTO"
+            },
+            "nullable": true
+          },
+          "ventasPorCategoria": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartPointDTO"
+            },
+            "nullable": true
+          },
+          "ventasPorMes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChartPointDTO"
+            },
+            "nullable": true
+          },
+          "topProductos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopProductoDTO"
+            },
+            "nullable": true
+          },
+          "alertasStock": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockAlertDTO"
+            },
+            "nullable": true
+          },
+          "ultimasVentas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UltimaVentaDTO"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DashboardSummaryDTO": {
+        "type": "object",
+        "properties": {
+          "ventasHoy": {
+            "type": "number",
+            "format": "double"
+          },
+          "transaccionesHoy": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ventasSemana": {
+            "type": "number",
+            "format": "double"
+          },
+          "transaccionesSemana": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ventasMes": {
+            "type": "number",
+            "format": "double"
+          },
+          "transaccionesMes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ingresosTotales": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalVentas": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalProductos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCategorias": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stockBajoCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sinStockCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clientesRegistrados": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clientesVIP": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "trabajadoresActivos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "trabajadoresTotal": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -4224,6 +4392,61 @@
         },
         "additionalProperties": false
       },
+      "StockAlertDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "categoria": {
+            "type": "string",
+            "nullable": true
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stockMinimo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "agotado": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TopProductoDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "categoria": {
+            "type": "string",
+            "nullable": true
+          },
+          "unidadesVendidas": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ingresoGenerado": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "Trabajador": {
         "type": "object",
         "properties": {
@@ -4334,6 +4557,44 @@
               "$ref": "#/components/schemas/Cotizacion"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UltimaVentaDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cliente": {
+            "type": "string",
+            "nullable": true
+          },
+          "trabajador": {
+            "type": "string",
+            "nullable": true
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
+          },
+          "estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "metodoPago": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalItems": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -4499,6 +4760,9 @@
     },
     {
       "name": "Cotizaciones"
+    },
+    {
+      "name": "Dashboard"
     },
     {
       "name": "Devoluciones"

@@ -389,6 +389,26 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "API_SI.Controllers.DashboardController",
+    "Method": "GetDashboard",
+    "RelativePath": "api/Dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "API_SI.DTOs.Dashboard.DashboardResponseDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "API_SI.Controllers.DevolucionesController",
     "Method": "GetAll",
     "RelativePath": "api/Devoluciones",

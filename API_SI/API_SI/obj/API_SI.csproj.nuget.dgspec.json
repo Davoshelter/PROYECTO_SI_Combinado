@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\UPDS\\MODULO 7\\SISTEMAS DE INFORMACION 2\\PROYECTO\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj": {}
+    "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj": {}
   },
   "projects": {
-    "D:\\UPDS\\MODULO 7\\SISTEMAS DE INFORMACION 2\\PROYECTO\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj": {
+    "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\UPDS\\MODULO 7\\SISTEMAS DE INFORMACION 2\\PROYECTO\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj",
+        "projectUniqueName": "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj",
         "projectName": "API_SI",
-        "projectPath": "D:\\UPDS\\MODULO 7\\SISTEMAS DE INFORMACION 2\\PROYECTO\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj",
-        "packagesPath": "C:\\Users\\Premi\\.nuget\\packages\\",
-        "outputPath": "D:\\UPDS\\MODULO 7\\SISTEMAS DE INFORMACION 2\\PROYECTO\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\obj\\",
+        "projectPath": "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\API_SI.csproj",
+        "packagesPath": "C:\\Users\\Personal\\.nuget\\packages\\",
+        "outputPath": "D:\\PROYECTO_SI_Combinado\\API_SI\\API_SI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "D:\\Visualstudio1\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Premi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Personal\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

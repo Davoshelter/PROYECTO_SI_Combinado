@@ -55,7 +55,6 @@ D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\API_SI.dll
 D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\API_SI.pdb
 D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\BCrypt.Net-Next.dll
 D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.dll
 D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Relational.dll
@@ -183,3 +182,6 @@ D:\UPDS\MODULO 7\SISTEMAS DE INFORMACION 2\PROYECTO\PROYECTO_SI_Combinado\API_SI
 D:\UPDS\MODULO 7\SISTEMAS DE INFORMACION 2\PROYECTO\PROYECTO_SI_Combinado\API_SI\API_SI\obj\Debug\net9.0\ref\API_SI.dll
 D:\UPDS\MODULO 7\SISTEMAS DE INFORMACION 2\PROYECTO\PROYECTO_SI_Combinado\API_SI\API_SI\obj\Debug\net9.0\swae.build.ex.cache
 D:\UPDS\MODULO 7\SISTEMAS DE INFORMACION 2\PROYECTO\PROYECTO_SI_Combinado\API_SI\API_SI\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\PROYECTO_SI_Combinado\API_SI\API_SI\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
